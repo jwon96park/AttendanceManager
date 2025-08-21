@@ -5,16 +5,28 @@
 #include <map>
 #include <algorithm>
 #include "attendance.h"
+#include "player.cpp"
 
 using namespace std;
 
-PlayerData playerData[MAX_PLAYER_NUM];
+Player players[MAX_PLAYER_NUM];
 map<string, int> playerID;
 
+#ifdef _DEBUG
+#include "gmock/gmock.h"
+
+using namespace testing;
+
+int main(int argc, char** argv) {
+	InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
+#else
 int main() {
 	inputByFile();
 	checkAttendance();
 }
+#endif
 
 void inputByFile() {
 	const int INPUT_NUM = 500;
@@ -43,38 +55,38 @@ void insertPlayer(const std::string& name)
 {
 	int id = playerID.size() + 1;
 	playerID.insert({ name, id });
-	playerData[id].name = name;
+	players[id].setName(name);
 }
 
 void addDayCount(const std::string& name, const std::string& day)
 {
 	int id = playerID[name];
-	playerData[id].dayCount[day] += 1;
+	players[id].addDayCount(day);
 }
 
 void addPoint(const std::string& name, const std::string& day)
 {
 	int id = playerID[name];
 	if (day == "monday") {
-		playerData[id].point += 1;
+		players[id].addPoint(1);
 	}
 	if (day == "tuesday") {
-		playerData[id].point += 1;
+		players[id].addPoint(1);
 	}
 	if (day == "wednesday") {
-		playerData[id].point += 3;
+		players[id].addPoint(3);
 	}
 	if (day == "thursday") {
-		playerData[id].point += 1;
+		players[id].addPoint(1);
 	}
 	if (day == "friday") {
-		playerData[id].point += 1;
+		players[id].addPoint(1);
 	}
 	if (day == "saturday") {
-		playerData[id].point += 2;
+		players[id].addPoint(2);
 	}
 	if (day == "sunday") {
-		playerData[id].point += 2;
+		players[id].addPoint(2);
 	}
 }
 
@@ -93,13 +105,13 @@ void checkAttendance() {
 void addBonusPoint()
 {
 	for (int id = 1; id <= playerID.size(); id++) {
-		if (playerData[id].dayCount["wednesday"] >= 10) {
-			playerData[id].point += 10;
+		if (players[id].getDayCount("wednesday") >= 10) {
+			players[id].addPoint(10);
 		}
 
-		const int weekendCount = playerData[id].dayCount["saturday"] + playerData[id].dayCount["sunday"];
+		const int weekendCount = players[id].getDayCount("saturday") + players[id].getDayCount("sunday");
 		if (weekendCount >= 10) {
-			playerData[id].point += 10;
+			players[id].addPoint(10);
 		}
 	}
 }
@@ -107,10 +119,10 @@ void addBonusPoint()
 void setGrade(Grade grade[MAX_PLAYER_NUM])
 {
 	for (int id = 1; id <= playerID.size(); id++) {
-		if (playerData[id].point >= 50) {
+		if (players[id].getPoint() >= 50) {
 			grade[id] = GOLD;
 		}
-		else if (playerData[id].point >= 30) {
+		else if (players[id].getPoint() >= 30) {
 			grade[id] = SILVER;
 		}
 		else {
@@ -122,8 +134,8 @@ void setGrade(Grade grade[MAX_PLAYER_NUM])
 void printScoreEachPlayer(const Grade grade[MAX_PLAYER_NUM])
 {
 	for (int id = 1; id <= playerID.size(); id++) {
-		std::cout << "NAME : " << playerData[id].name << ", ";
-		std::cout << "POINT : " << playerData[id].point << ", ";
+		std::cout << "NAME : " << players[id].getName() << ", ";
+		std::cout << "POINT : " << players[id].getPoint() << ", ";
 		std::cout << "GRADE : ";
 
 		if (grade[id] == GOLD) {
@@ -145,7 +157,7 @@ void printRemovedPlayers(const Grade grade[MAX_PLAYER_NUM])
 	std::cout << "==============\n";
 	for (int id = 1; id <= playerID.size(); id++) {
 		if (isRemovedPlayer(grade[id], id)) {
-			std::cout << playerData[id].name << "\n";
+			std::cout << players[id].getName() << "\n";
 		}
 	}
 }
@@ -153,6 +165,6 @@ void printRemovedPlayers(const Grade grade[MAX_PLAYER_NUM])
 bool isRemovedPlayer(const Grade grade, int id)
 {
 	return grade != GOLD && grade != SILVER
-		&& playerData[id].dayCount["wednesday"] == 0
-		&& (playerData[id].dayCount["saturday"] + playerData[id].dayCount["sunday"]) == 0;
+		&& players[id].getDayCount("wednesday") == 0
+		&& (players[id].getDayCount("saturday") + players[id].getDayCount("sunday")) == 0;
 }
