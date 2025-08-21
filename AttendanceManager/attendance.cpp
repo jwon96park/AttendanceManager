@@ -4,113 +4,111 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include "attendance.h"
 
 using namespace std;
 
+const int MAX_PLAYER_NUM = 100;
+const int WEEKDAY_NUM = 7;
+
 struct Node {
-	string w;
-	string wk;
+	string name;
+	string day;
 };
 
-map<string, int> id1;
-int id_cnt = 0;
+map<string, int> playerID;
 
-//dat[사용자ID][요일]
-int dat[100][100];
-int points[100];
-int grade[100];
-string names[100];
+int playerData[MAX_PLAYER_NUM][WEEKDAY_NUM];
+int playerPoint[MAX_PLAYER_NUM];
+int grade[MAX_PLAYER_NUM];
+string playerName[MAX_PLAYER_NUM];
 
-int wed[100];
-int weeken[100];
+int wednesdayRecords[MAX_PLAYER_NUM];
+int weekendRecords[MAX_PLAYER_NUM];
 
-void input2(string w, string wk) {
-	//ID 부여
-	if (id1.count(w) == 0) {
-		id1.insert({ w, ++id_cnt });
-
-		if (w == "Daisy") {
-			int debug = 1;
-		}
-
-		names[id_cnt] = w;
-	}
-	int id2 = id1[w];
-
-	//디버깅용
-	if (w == "Daisy") {
-		int debug = 1;
-	}
-
-
-	int add_point = 0;
-	int index = 0;
-	if (wk == "monday") {
-		index = 0;
-		add_point++;
-	}
-	if (wk == "tuesday") {
-		index = 1;
-		add_point++;
-	}
-	if (wk == "wednesday") {
-		index = 2;
-		add_point += 3;
-		wed[id2] += 1;
-	}
-	if (wk == "thursday") {
-		index = 3;
-		add_point++;
-	}
-	if (wk == "friday") {
-		index = 4;
-		add_point++;
-	}
-	if (wk == "saturday") {
-		index = 5;
-		add_point += 2;
-		weeken[id2] += 1;
-	}
-	if (wk == "sunday") {
-		index = 6;
-		add_point += 2;
-		weeken[id2] += 1;
-	}
-
-	//사용자ID별 요일 데이터에 1씩 증가
-	dat[id2][index] += 1;
-	points[id2] += add_point;
+int main() {
+	inputByFile();
+	checkAttendance();
 }
 
-void input() {
-	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
-	for (int i = 0; i < 500; i++) {
-		string t1, t2;
-		fin >> t1 >> t2;
-		input2(t1, t2);
+void inputByFile() {
+	const int INPUT_NUM = 500;
+	ifstream fin{ "attendance_weekday_500.txt" };
+	for (int i = 0; i < INPUT_NUM; i++) {
+		string name, day;
+		fin >> name >> day;
+		countAttendance(name, day);
+	}
+}
+
+void countAttendance(string name, string day) {
+	if (playerID.count(name) == 0) {
+		int id = playerID.size() + 1;
+		playerID.insert({ name, id });
+		playerName[id] = name;
+	}
+	int id = playerID[name];
+
+	int point = 0;
+	int index = 0;
+	if (day == "monday") {
+		index = 0;
+		point += 1;
+	}
+	if (day == "tuesday") {
+		index = 1;
+		point += 1;
+	}
+	if (day == "wednesday") {
+		index = 2;
+		point += 3;
+		wednesdayRecords[id] += 1;
+	}
+	if (day == "thursday") {
+		index = 3;
+		point++;
+	}
+	if (day == "friday") {
+		index = 4;
+		point += 1;
+	}
+	if (day == "saturday") {
+		index = 5;
+		point += 2;
+		weekendRecords[id] += 1;
+	}
+	if (day == "sunday") {
+		index = 6;
+		point += 2;
+		weekendRecords[id] += 1;
 	}
 
-	for (int i = 1; i <= id_cnt; i++) {
-		if (dat[i][2] > 9) {
-			points[i] += 10;
+	playerData[id][index] += 1;
+	playerPoint[id] += point;
+}
+
+void checkAttendance() {
+	for (int i = 1; i <= playerID.size(); i++) {
+		if (playerData[i][2] > 9) {
+			playerPoint[i] += 10;
 		}
 
-		if (dat[i][5] + dat[i][6] > 9) {
-			points[i] += 10;
+		if (playerData[i][5] + playerData[i][6] > 9) {
+			playerPoint[i] += 10;
 		}
 
-		if (points[i] >= 50) {
+		if (playerPoint[i] >= 50) {
 			grade[i] = 1;
 		}
-		else if (points[i] >= 30) {
+		else if (playerPoint[i] >= 30) {
 			grade[i] = 2;
 		}
 		else {
 			grade[i] = 0;
 		}
 
-		cout << "NAME : " << names[i] << ", ";
-		cout << "POINT : " << points[i] << ", ";
+		cout << "NAME : " << playerName[i] << ", ";
+		cout << "POINT : " << playerPoint[i] << ", ";
 		cout << "GRADE : ";
 
 		if (grade[i] == 1) {
@@ -127,14 +125,9 @@ void input() {
 	std::cout << "\n";
 	std::cout << "Removed player\n";
 	std::cout << "==============\n";
-	for (int i = 1; i <= id_cnt; i++) {
-
-		if (grade[i] != 1 && grade[i] != 2 && wed[i] == 0 && weeken[i] == 0) {
-			std::cout << names[i] << "\n";
+	for (int i = 1; i <= playerID.size(); i++) {
+		if (grade[i] != 1 && grade[i] != 2 && wednesdayRecords[i] == 0 && weekendRecords[i] == 0) {
+			std::cout << playerName[i] << "\n";
 		}
 	}
-}
-
-int main() {
-	input();
 }
