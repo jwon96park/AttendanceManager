@@ -8,6 +8,11 @@ enum Grade {
 
 class GradeCalculator {
 public:
+	static GradeCalculator& getInstance() {
+		static GradeCalculator instance;
+		return instance;
+	}
+
 	Grade calculateGrade(int point) const {
 		if (point >= 50) {
 			return GOLD;
@@ -22,4 +27,10 @@ public:
 	{
 		return grade != GOLD && grade != SILVER;
 	}
+
+	GradeCalculator() {
+
+	}
+	GradeCalculator(const GradeCalculator&) = delete;
+	GradeCalculator& operator=(const GradeCalculator&) = delete;
 };

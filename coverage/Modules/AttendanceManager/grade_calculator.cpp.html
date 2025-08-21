@@ -19,20 +19,31 @@ enum Grade {
 
 class GradeCalculator {
 public:
-<span style = "background-color:#dfd">	Grade calculateGrade(int point) const {
-		if (point &gt;= 50) {
+<span style = "background-color:#dfd">	static GradeCalculator&amp; getInstance() {
+		static GradeCalculator instance;
+		return instance;
+	}
+</span>
+<span style = "background-color:#fdd">	Grade calculateGrade(int point) const {</span>
+<span style = "background-color:#dfd">		if (point &gt;= 50) {</span>
 			return GOLD;
-		} else if (point &gt;= 30) {
-			return SILVER;</span>
-<span style = "background-color:#fdd">		} else {</span>
-<span style = "background-color:#dfd">			return NORMAL;</span>
+<span style = "background-color:#dfd">		} else if (point &gt;= 30) {</span>
+			return SILVER;
+		} else {
+<span style = "background-color:#dfd">			return NORMAL;
 		}
-<span style = "background-color:#dfd">	}</span>
+	}</span>
 
 	bool isRemovedPlayer(const Grade grade)
-<span style = "background-color:#dfd">	{
+	{
 		return grade != GOLD &amp;&amp; grade != SILVER;
-	}</span>
+	}
+
+	GradeCalculator() {
+
+	}
+	GradeCalculator(const GradeCalculator&amp;) = delete;
+	GradeCalculator&amp; operator=(const GradeCalculator&amp;) = delete;
 };</pre>
         <hr />
         <table width="100%">
