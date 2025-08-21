@@ -1,9 +1,10 @@
+#pragma once
 #include <string>
 #include <map>
 
 using namespace std;
 
-class Player {
+class PlayerInfo {
 private:
 	string name;
 	int id;
@@ -40,5 +41,5 @@ public:
 		point += addedPoint;
 	}
 
-	Player() = default;
+	PlayerInfo() = default;
 };
