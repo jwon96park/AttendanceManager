@@ -8,23 +8,8 @@
 
 using namespace std;
 
-const int MAX_PLAYER_NUM = 100;
-const int WEEKDAY_NUM = 7;
-
-struct Node {
-	string name;
-	string day;
-};
-
+PlayerData playerData[MAX_PLAYER_NUM];
 map<string, int> playerID;
-
-int playerData[MAX_PLAYER_NUM][WEEKDAY_NUM];
-int playerPoint[MAX_PLAYER_NUM];
-int grade[MAX_PLAYER_NUM];
-string playerName[MAX_PLAYER_NUM];
-
-int wednesdayRecords[MAX_PLAYER_NUM];
-int weekendRecords[MAX_PLAYER_NUM];
 
 int main() {
 	inputByFile();
@@ -42,92 +27,132 @@ void inputByFile() {
 }
 
 void countAttendance(string name, string day) {
-	if (playerID.count(name) == 0) {
-		int id = playerID.size() + 1;
-		playerID.insert({ name, id });
-		playerName[id] = name;
-	}
-	int id = playerID[name];
+	if (isFirstTime(name))
+		insertPlayer(name);
 
-	int point = 0;
-	int index = 0;
+	addDayCount(name, day);
+	addPoint(name, day);
+}
+
+bool isFirstTime(const std::string& name)
+{
+	return playerID.count(name) == 0;
+}
+
+void insertPlayer(const std::string& name)
+{
+	int id = playerID.size() + 1;
+	playerID.insert({ name, id });
+	playerData[id].name = name;
+}
+
+void addDayCount(const std::string& name, const std::string& day)
+{
+	int id = playerID[name];
+	playerData[id].dayCount[day] += 1;
+}
+
+void addPoint(const std::string& name, const std::string& day)
+{
+	int id = playerID[name];
 	if (day == "monday") {
-		index = 0;
-		point += 1;
+		playerData[id].point += 1;
 	}
 	if (day == "tuesday") {
-		index = 1;
-		point += 1;
+		playerData[id].point += 1;
 	}
 	if (day == "wednesday") {
-		index = 2;
-		point += 3;
-		wednesdayRecords[id] += 1;
+		playerData[id].point += 3;
 	}
 	if (day == "thursday") {
-		index = 3;
-		point++;
+		playerData[id].point += 1;
 	}
 	if (day == "friday") {
-		index = 4;
-		point += 1;
+		playerData[id].point += 1;
 	}
 	if (day == "saturday") {
-		index = 5;
-		point += 2;
-		weekendRecords[id] += 1;
+		playerData[id].point += 2;
 	}
 	if (day == "sunday") {
-		index = 6;
-		point += 2;
-		weekendRecords[id] += 1;
+		playerData[id].point += 2;
 	}
-
-	playerData[id][index] += 1;
-	playerPoint[id] += point;
 }
 
 void checkAttendance() {
-	for (int i = 1; i <= playerID.size(); i++) {
-		if (playerData[i][2] > 9) {
-			playerPoint[i] += 10;
+	Grade grade[MAX_PLAYER_NUM] = { NORMAL };
+
+	addBonusPoint();
+
+	setGrade(grade);
+
+	printScoreEachPlayer(grade);
+
+	printRemovedPlayers(grade);
+}
+
+void addBonusPoint()
+{
+	for (int id = 1; id <= playerID.size(); id++) {
+		if (playerData[id].dayCount["wednesday"] >= 10) {
+			playerData[id].point += 10;
 		}
 
-		if (playerData[i][5] + playerData[i][6] > 9) {
-			playerPoint[i] += 10;
-		}
-
-		if (playerPoint[i] >= 50) {
-			grade[i] = 1;
-		}
-		else if (playerPoint[i] >= 30) {
-			grade[i] = 2;
-		}
-		else {
-			grade[i] = 0;
-		}
-
-		cout << "NAME : " << playerName[i] << ", ";
-		cout << "POINT : " << playerPoint[i] << ", ";
-		cout << "GRADE : ";
-
-		if (grade[i] == 1) {
-			cout << "GOLD" << "\n";
-		}
-		else if (grade[i] == 2) {
-			cout << "SILVER" << "\n";
-		}
-		else {
-			cout << "NORMAL" << "\n";
+		const int weekendCount = playerData[id].dayCount["saturday"] + playerData[id].dayCount["sunday"];
+		if (weekendCount >= 10) {
+			playerData[id].point += 10;
 		}
 	}
+}
 
+void setGrade(Grade grade[MAX_PLAYER_NUM])
+{
+	for (int id = 1; id <= playerID.size(); id++) {
+		if (playerData[id].point >= 50) {
+			grade[id] = GOLD;
+		}
+		else if (playerData[id].point >= 30) {
+			grade[id] = SILVER;
+		}
+		else {
+			grade[id] = NORMAL;
+		}
+	}
+}
+
+void printScoreEachPlayer(const Grade grade[MAX_PLAYER_NUM])
+{
+	for (int id = 1; id <= playerID.size(); id++) {
+		std::cout << "NAME : " << playerData[id].name << ", ";
+		std::cout << "POINT : " << playerData[id].point << ", ";
+		std::cout << "GRADE : ";
+
+		if (grade[id] == GOLD) {
+			std::cout << "GOLD" << "\n";
+		}
+		else if (grade[id] == SILVER) {
+			std::cout << "SILVER" << "\n";
+		}
+		else {
+			std::cout << "NORMAL" << "\n";
+		}
+	}
+}
+
+void printRemovedPlayers(const Grade grade[MAX_PLAYER_NUM])
+{
 	std::cout << "\n";
 	std::cout << "Removed player\n";
 	std::cout << "==============\n";
-	for (int i = 1; i <= playerID.size(); i++) {
-		if (grade[i] != 1 && grade[i] != 2 && wednesdayRecords[i] == 0 && weekendRecords[i] == 0) {
-			std::cout << playerName[i] << "\n";
+	for (int id = 1; id <= playerID.size(); id++) {
+		if (isRemovedPlayer(grade[id], id)) {
+			std::cout << playerData[id].name << "\n";
 		}
 	}
+}
+
+bool isRemovedPlayer(const Grade grade, int id)
+{
+	return grade != GOLD && grade != SILVER
+		&& playerData[id].dayCount["wednesday"] == 0
+		&& (playerData[id].dayCount["saturday"] + playerData[id].dayCount["sunday"]) == 0;
 }
