@@ -9,16 +9,6 @@
 
 using namespace std;
 
-void inputByFile(Manager& manager) {
-	const int INPUT_NUM = 500;
-	ifstream fin{ "attendance_weekday_500.txt" };
-	for (int i = 0; i < INPUT_NUM; i++) {
-		string name, day;
-		fin >> name >> day;
-		manager.countAttendance(name, day);
-	}
-}
-
 #ifdef _DEBUG
 #include "gmock/gmock.h"
 
@@ -29,6 +19,16 @@ int main(int argc, char** argv) {
 	return RUN_ALL_TESTS();
 }
 #else
+void inputByFile(Manager& manager) {
+	const int INPUT_NUM = 500;
+	ifstream fin{ "attendance_weekday_500.txt" };
+	for (int i = 0; i < INPUT_NUM; i++) {
+		string name, day;
+		fin >> name >> day;
+		manager.countAttendance(name, day);
+	}
+}
+
 int main() {
 	Manager manager;
 

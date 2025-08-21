@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+        <meta charset="utf-8"/>
+	    <title>manager.cpp</title>
+	    <link href="../../third-party/google-code-prettify/prettify-CppCoverage.css" type="text/css" rel="stylesheet" />
+	    <script type="text/javascript" src="../../third-party/google-code-prettify/prettify.js"></script>
+	</head>
+    <body onload="prettyPrint()">
+        <h4></h4>
+        <pre class="prettyprint lang-cpp linenums">
+#pragma once
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;map&gt;
+
+#include "player.cpp"
+
+using namespace std;
+
+const int MAX_PLAYER_NUM = 100;
+const int WEEKDAY_NUM = 7;
+
+enum Grade {
+	NORMAL,
+	SILVER,
+	GOLD
+};
+
+class Manager {
+private:
+	map&lt;string, int&gt; playerID;
+	PlayerInfo playerList[MAX_PLAYER_NUM];
+
+	bool isFirstTime(const std::string&amp; name)
+<span style = "background-color:#dfd">	{
+		return playerID.count(name) == 0;
+	}</span>
+
+	void insertPlayer(const std::string&amp; name)
+<span style = "background-color:#dfd">	{
+		int id = playerID.size() + 1;
+		playerID.insert({ name, id });
+		playerList[id].setName(name);
+	}</span>
+
+	void addDayCount(const std::string&amp; name, const std::string&amp; day)
+<span style = "background-color:#dfd">	{
+		int id = playerID[name];
+		playerList[id].addDayCount(day);
+	}</span>
+
+	void addPoint(const std::string&amp; name, const std::string&amp; day)
+<span style = "background-color:#dfd">	{
+		int id = playerID[name];
+		if (day == "monday") {
+			playerList[id].addPoint(1);</span>
+		}
+<span style = "background-color:#dfd">		if (day == "tuesday") {
+			playerList[id].addPoint(1);</span>
+		}
+<span style = "background-color:#dfd">		if (day == "wednesday") {
+			playerList[id].addPoint(3);</span>
+		}
+<span style = "background-color:#dfd">		if (day == "thursday") {
+			playerList[id].addPoint(1);</span>
+		}
+<span style = "background-color:#dfd">		if (day == "friday") {
+			playerList[id].addPoint(1);</span>
+		}
+<span style = "background-color:#dfd">		if (day == "saturday") {
+			playerList[id].addPoint(2);</span>
+		}
+<span style = "background-color:#dfd">		if (day == "sunday") {
+			playerList[id].addPoint(2);</span>
+		}
+<span style = "background-color:#dfd">	}</span>
+
+	void printRemovedplayer(const Grade grade[MAX_PLAYER_NUM])
+<span style = "background-color:#dfd">	{
+		std::cout &lt;&lt; "\n";
+		std::cout &lt;&lt; "Removed player\n";
+		std::cout &lt;&lt; "==============\n";
+		for (int id = 1; id &lt;= playerID.size(); id++) {
+			if (isRemovedPlayer(grade[id], id)) {
+				std::cout &lt;&lt; playerList[id].getName() &lt;&lt; "\n";</span>
+			}
+<span style = "background-color:#dfd">		}
+	}</span>
+
+	void addBonusPoint()
+<span style = "background-color:#dfd">	{
+		for (int id = 1; id &lt;= playerID.size(); id++) {
+			if (playerList[id].getDayCount("wednesday") &gt;= 10) {
+				playerList[id].addPoint(10);</span>
+			}
+
+<span style = "background-color:#dfd">			const int weekendCount = playerList[id].getDayCount("saturday") + playerList[id].getDayCount("sunday");
+			if (weekendCount &gt;= 10) {
+				playerList[id].addPoint(10);</span>
+			}
+<span style = "background-color:#dfd">		}
+	}</span>
+
+	void setGrade(Grade grade[MAX_PLAYER_NUM])
+<span style = "background-color:#dfd">	{
+		for (int id = 1; id &lt;= playerID.size(); id++) {
+			if (playerList[id].getPoint() &gt;= 50) {
+				grade[id] = GOLD;
+			}
+			else if (playerList[id].getPoint() &gt;= 30) {
+				grade[id] = SILVER;
+			}</span>
+			else {
+<span style = "background-color:#dfd">				grade[id] = NORMAL;</span>
+			}
+<span style = "background-color:#dfd">		}
+	}</span>
+
+	void printScoreEachPlayer(const Grade grade[MAX_PLAYER_NUM])
+<span style = "background-color:#dfd">	{
+		for (int id = 1; id &lt;= playerID.size(); id++) {
+			std::cout &lt;&lt; "NAME : " &lt;&lt; playerList[id].getName() &lt;&lt; ", ";
+			std::cout &lt;&lt; "POINT : " &lt;&lt; playerList[id].getPoint() &lt;&lt; ", ";
+			std::cout &lt;&lt; "GRADE : ";</span>
+
+<span style = "background-color:#dfd">			if (grade[id] == GOLD) {
+				std::cout &lt;&lt; "GOLD" &lt;&lt; "\n";
+			}
+			else if (grade[id] == SILVER) {
+				std::cout &lt;&lt; "SILVER" &lt;&lt; "\n";
+			}</span>
+			else {
+<span style = "background-color:#dfd">				std::cout &lt;&lt; "NORMAL" &lt;&lt; "\n";</span>
+			}
+<span style = "background-color:#dfd">		}
+	}</span>
+
+	bool isRemovedPlayer(const Grade grade, int id)
+<span style = "background-color:#dfd">	{
+		return grade != GOLD &amp;&amp; grade != SILVER</span>
+			&amp;&amp; playerList[id].getDayCount("wednesday") == 0
+			&amp;&amp; (playerList[id].getDayCount("saturday") + playerList[id].getDayCount("sunday")) == 0;
+<span style = "background-color:#dfd">	}</span>
+public:
+<span style = "background-color:#dfd">	void countAttendance(string name, string day) {
+		if (isFirstTime(name))
+			insertPlayer(name);</span>
+
+<span style = "background-color:#dfd">		addDayCount(name, day);
+		addPoint(name, day);
+	}</span>
+
+<span style = "background-color:#dfd">	void checkAttendance() {
+		Grade grade[MAX_PLAYER_NUM] = { NORMAL };</span>
+
+<span style = "background-color:#dfd">		addBonusPoint();</span>
+
+<span style = "background-color:#dfd">		setGrade(grade);</span>
+
+<span style = "background-color:#dfd">		printScoreEachPlayer(grade);</span>
+
+<span style = "background-color:#dfd">		printRemovedplayer(grade);
+	}</span>
+
+<span style = "background-color:#dfd">	PlayerInfo getPlayerInfo(const int id) {
+		return playerList[id];
+	}</span>
+};</pre>
+        <hr />
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th align="center">
+                        <small>Generated by</small>
+                        <a href="https://github.com/OpenCppCoverage/OpenCppCoverage/releases">
+                            <strong>OpenCppCoverage (Version: 0.9.9.0)</strong>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </body>
+</html>
