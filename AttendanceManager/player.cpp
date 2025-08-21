@@ -2,6 +2,8 @@
 #include <string>
 #include <map>
 
+#include "grade_calculator.cpp"
+
 using namespace std;
 
 class PlayerInfo {
@@ -9,8 +11,15 @@ private:
 	string name;
 	int id;
 	int point;
+	Grade grade;
 	map<string, int> dayCount;
 public:
+	void setGrade(Grade playerGrade) {
+		grade = playerGrade;
+	}
+	Grade getGrade() {
+		return grade;
+	}
 	void setName(const string& playerName) {
 		name = playerName;
 	}

@@ -13,6 +13,8 @@
 #include &lt;string&gt;
 #include &lt;map&gt;
 
+#include "grade_calculator.cpp"
+
 using namespace std;
 
 class PlayerInfo {
@@ -20,9 +22,16 @@ private:
 	string name;
 	int id;
 	int point;
+	Grade grade;
 	map&lt;string, int&gt; dayCount;
 public:
-<span style = "background-color:#dfd">	void setName(const string&amp; playerName) {
+<span style = "background-color:#dfd">	void setGrade(Grade playerGrade) {
+		grade = playerGrade;
+	}
+	Grade getGrade() {
+		return grade;
+	}
+	void setName(const string&amp; playerName) {
 		name = playerName;
 	}</span>
 	void setId(int playerId) {

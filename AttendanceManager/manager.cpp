@@ -6,22 +6,18 @@
 #include <map>
 
 #include "player.cpp"
+#include "grade_calculator.cpp"
 
 using namespace std;
 
 const int MAX_PLAYER_NUM = 100;
 const int WEEKDAY_NUM = 7;
 
-enum Grade {
-	NORMAL,
-	SILVER,
-	GOLD
-};
-
 class Manager {
 private:
 	map<string, int> playerID;
 	PlayerInfo playerList[MAX_PLAYER_NUM];
+	GradeCalculator	gradeCalculator;
 
 	bool isFirstTime(const std::string& name)
 	{
@@ -67,13 +63,13 @@ private:
 		}
 	}
 
-	void printRemovedplayer(const Grade grade[MAX_PLAYER_NUM])
+	void printRemovedplayer()
 	{
 		std::cout << "\n";
 		std::cout << "Removed player\n";
 		std::cout << "==============\n";
 		for (int id = 1; id <= playerID.size(); id++) {
-			if (isRemovedPlayer(grade[id], id)) {
+			if (isRemovedPlayer(id) && gradeCalculator.isRemovedPlayer(playerList[id].getGrade())) {
 				std::cout << playerList[id].getName() << "\n";
 			}
 		}
@@ -93,32 +89,24 @@ private:
 		}
 	}
 
-	void setGrade(Grade grade[MAX_PLAYER_NUM])
+	void setGrade()
 	{
 		for (int id = 1; id <= playerID.size(); id++) {
-			if (playerList[id].getPoint() >= 50) {
-				grade[id] = GOLD;
-			}
-			else if (playerList[id].getPoint() >= 30) {
-				grade[id] = SILVER;
-			}
-			else {
-				grade[id] = NORMAL;
-			}
+			playerList[id].setGrade(gradeCalculator.calculateGrade(playerList[id].getPoint()));
 		}
 	}
 
-	void printScoreEachPlayer(const Grade grade[MAX_PLAYER_NUM])
+	void printScoreEachPlayer()
 	{
 		for (int id = 1; id <= playerID.size(); id++) {
 			std::cout << "NAME : " << playerList[id].getName() << ", ";
 			std::cout << "POINT : " << playerList[id].getPoint() << ", ";
 			std::cout << "GRADE : ";
 
-			if (grade[id] == GOLD) {
+			if (playerList[id].getGrade() == GOLD) {
 				std::cout << "GOLD" << "\n";
 			}
-			else if (grade[id] == SILVER) {
+			else if (playerList[id].getGrade() == SILVER) {
 				std::cout << "SILVER" << "\n";
 			}
 			else {
@@ -127,10 +115,9 @@ private:
 		}
 	}
 
-	bool isRemovedPlayer(const Grade grade, int id)
+	bool isRemovedPlayer(int id)
 	{
-		return grade != GOLD && grade != SILVER
-			&& playerList[id].getDayCount("wednesday") == 0
+		return playerList[id].getDayCount("wednesday") == 0
 			&& (playerList[id].getDayCount("saturday") + playerList[id].getDayCount("sunday")) == 0;
 	}
 public:
@@ -143,15 +130,14 @@ public:
 	}
 
 	void checkAttendance() {
-		Grade grade[MAX_PLAYER_NUM] = { NORMAL };
 
 		addBonusPoint();
 
-		setGrade(grade);
+		setGrade();
 
-		printScoreEachPlayer(grade);
+		printScoreEachPlayer();
 
-		printRemovedplayer(grade);
+		printRemovedplayer();
 	}
 
 	PlayerInfo getPlayerInfo(const int id) {

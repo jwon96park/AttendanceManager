@@ -17,22 +17,18 @@
 #include &lt;map&gt;
 
 #include "player.cpp"
+#include "grade_calculator.cpp"
 
 using namespace std;
 
 const int MAX_PLAYER_NUM = 100;
 const int WEEKDAY_NUM = 7;
 
-enum Grade {
-	NORMAL,
-	SILVER,
-	GOLD
-};
-
 class Manager {
 private:
 	map&lt;string, int&gt; playerID;
 	PlayerInfo playerList[MAX_PLAYER_NUM];
+	GradeCalculator	gradeCalculator;
 
 	bool isFirstTime(const std::string&amp; name)
 <span style = "background-color:#dfd">	{
@@ -78,13 +74,13 @@ private:
 		}
 <span style = "background-color:#dfd">	}</span>
 
-	void printRemovedplayer(const Grade grade[MAX_PLAYER_NUM])
+	void printRemovedplayer()
 <span style = "background-color:#dfd">	{
 		std::cout &lt;&lt; "\n";
 		std::cout &lt;&lt; "Removed player\n";
 		std::cout &lt;&lt; "==============\n";
 		for (int id = 1; id &lt;= playerID.size(); id++) {
-			if (isRemovedPlayer(grade[id], id)) {
+			if (isRemovedPlayer(id) &amp;&amp; gradeCalculator.isRemovedPlayer(playerList[id].getGrade())) {
 				std::cout &lt;&lt; playerList[id].getName() &lt;&lt; "\n";</span>
 			}
 <span style = "background-color:#dfd">		}
@@ -104,32 +100,24 @@ private:
 <span style = "background-color:#dfd">		}
 	}</span>
 
-	void setGrade(Grade grade[MAX_PLAYER_NUM])
+	void setGrade()
 <span style = "background-color:#dfd">	{
 		for (int id = 1; id &lt;= playerID.size(); id++) {
-			if (playerList[id].getPoint() &gt;= 50) {
-				grade[id] = GOLD;
-			}
-			else if (playerList[id].getPoint() &gt;= 30) {
-				grade[id] = SILVER;
-			}</span>
-			else {
-<span style = "background-color:#dfd">				grade[id] = NORMAL;</span>
-			}
-<span style = "background-color:#dfd">		}
+			playerList[id].setGrade(gradeCalculator.calculateGrade(playerList[id].getPoint()));
+		}
 	}</span>
 
-	void printScoreEachPlayer(const Grade grade[MAX_PLAYER_NUM])
+	void printScoreEachPlayer()
 <span style = "background-color:#dfd">	{
 		for (int id = 1; id &lt;= playerID.size(); id++) {
 			std::cout &lt;&lt; "NAME : " &lt;&lt; playerList[id].getName() &lt;&lt; ", ";
 			std::cout &lt;&lt; "POINT : " &lt;&lt; playerList[id].getPoint() &lt;&lt; ", ";
 			std::cout &lt;&lt; "GRADE : ";</span>
 
-<span style = "background-color:#dfd">			if (grade[id] == GOLD) {
+<span style = "background-color:#dfd">			if (playerList[id].getGrade() == GOLD) {
 				std::cout &lt;&lt; "GOLD" &lt;&lt; "\n";
 			}
-			else if (grade[id] == SILVER) {
+			else if (playerList[id].getGrade() == SILVER) {
 				std::cout &lt;&lt; "SILVER" &lt;&lt; "\n";
 			}</span>
 			else {
@@ -138,10 +126,9 @@ private:
 <span style = "background-color:#dfd">		}
 	}</span>
 
-	bool isRemovedPlayer(const Grade grade, int id)
+	bool isRemovedPlayer(int id)
 <span style = "background-color:#dfd">	{
-		return grade != GOLD &amp;&amp; grade != SILVER</span>
-			&amp;&amp; playerList[id].getDayCount("wednesday") == 0
+		return playerList[id].getDayCount("wednesday") == 0</span>
 			&amp;&amp; (playerList[id].getDayCount("saturday") + playerList[id].getDayCount("sunday")) == 0;
 <span style = "background-color:#dfd">	}</span>
 public:
@@ -153,16 +140,15 @@ public:
 		addPoint(name, day);
 	}</span>
 
-<span style = "background-color:#dfd">	void checkAttendance() {
-		Grade grade[MAX_PLAYER_NUM] = { NORMAL };</span>
+<span style = "background-color:#dfd">	void checkAttendance() {</span>
 
 <span style = "background-color:#dfd">		addBonusPoint();</span>
 
-<span style = "background-color:#dfd">		setGrade(grade);</span>
+<span style = "background-color:#dfd">		setGrade();</span>
 
-<span style = "background-color:#dfd">		printScoreEachPlayer(grade);</span>
+<span style = "background-color:#dfd">		printScoreEachPlayer();</span>
 
-<span style = "background-color:#dfd">		printRemovedplayer(grade);
+<span style = "background-color:#dfd">		printRemovedplayer();
 	}</span>
 
 <span style = "background-color:#dfd">	PlayerInfo getPlayerInfo(const int id) {
