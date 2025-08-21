@@ -153,4 +153,8 @@ public:
 
 		printRemovedplayer(grade);
 	}
+
+	PlayerInfo getPlayerInfo(const int id) {
+		return playerList[id];
+	}
 };
