@@ -4,6 +4,7 @@ using namespace std;
 
 #include "manager.cpp"
 #include "player.cpp"
+#include "grade_calculator.cpp"
 
 class ManagerTest : public Test {
 	protected:
@@ -99,4 +100,11 @@ TEST_F(ManagerTest, removed_player) {
 	manager.checkAttendance();
 	PlayerInfo player = manager.getPlayerInfo(2);
 	EXPECT_EQ(player.getPoint(), 1);
+}
+
+TEST(GRADE, GradeCalculator) {
+	GradeCalculator& gradeCalculator = GradeCalculator::getInstance();
+	EXPECT_EQ(gradeCalculator.calculateGrade(10), NORMAL);
+	EXPECT_EQ(gradeCalculator.calculateGrade(30), SILVER);
+	EXPECT_EQ(gradeCalculator.calculateGrade(50), GOLD);
 }

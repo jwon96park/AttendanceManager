@@ -22,26 +22,25 @@ public:
 <span style = "background-color:#dfd">	static GradeCalculator&amp; getInstance() {
 		static GradeCalculator instance;
 		return instance;
-	}
-</span>
-<span style = "background-color:#fdd">	Grade calculateGrade(int point) const {</span>
-<span style = "background-color:#dfd">		if (point &gt;= 50) {</span>
+	}</span>
+
+<span style = "background-color:#dfd">	Grade calculateGrade(int point) const {
+		if (point &gt;= 50) {
 			return GOLD;
-<span style = "background-color:#dfd">		} else if (point &gt;= 30) {</span>
-			return SILVER;
-		} else {
-<span style = "background-color:#dfd">			return NORMAL;
+		} else if (point &gt;= 30) {
+			return SILVER;</span>
 		}
+<span style = "background-color:#dfd">		return NORMAL;
 	}</span>
 
 	bool isRemovedPlayer(const Grade grade)
-	{
+<span style = "background-color:#dfd">	{
 		return grade != GOLD &amp;&amp; grade != SILVER;
-	}
+	}</span>
 
-	GradeCalculator() {
+<span style = "background-color:#dfd">	GradeCalculator() {</span>
 
-	}
+<span style = "background-color:#dfd">	}</span>
 	GradeCalculator(const GradeCalculator&amp;) = delete;
 	GradeCalculator&amp; operator=(const GradeCalculator&amp;) = delete;
 };</pre>

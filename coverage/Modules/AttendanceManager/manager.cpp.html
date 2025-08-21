@@ -103,7 +103,8 @@ private:
 	void setGrade()
 <span style = "background-color:#dfd">	{
 		for (int id = 1; id &lt;= playerID.size(); id++) {
-			playerList[id].setGrade(gradeCalculator.calculateGrade(playerList[id].getPoint()));
+			Grade playerGrade = gradeCalculator.calculateGrade(playerList[id].getPoint());
+			playerList[id].setGrade(playerGrade);
 		}
 	}</span>
 

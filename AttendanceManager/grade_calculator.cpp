@@ -18,9 +18,8 @@ public:
 			return GOLD;
 		} else if (point >= 30) {
 			return SILVER;
-		} else {
-			return NORMAL;
 		}
+		return NORMAL;
 	}
 
 	bool isRemovedPlayer(const Grade grade)

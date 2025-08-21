@@ -92,7 +92,8 @@ private:
 	void setGrade()
 	{
 		for (int id = 1; id <= playerID.size(); id++) {
-			playerList[id].setGrade(gradeCalculator.calculateGrade(playerList[id].getPoint()));
+			Grade playerGrade = gradeCalculator.calculateGrade(playerList[id].getPoint());
+			playerList[id].setGrade(playerGrade);
 		}
 	}
 
